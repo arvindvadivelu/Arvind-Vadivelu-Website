@@ -46,28 +46,48 @@ mobileNavLinks.forEach(link => {
 const projectsData = {
     'pibcache': {
         title: 'PibCache',
-        desc: 'A high-performance predictive caching prediction system built using TCN-Transformers. It predicts which articles will be popular in the next hour and caches them in Redis before traffic spikes. This reduced database load by 40% and improved response times by 200ms.',
+        desc: 'CarScrubz is a fully responsive car washing and detailing service website designed to: Showcase premium car wash packages, Present service benefits clearly, Improve customer engagement, Provide smooth and interactive browsing experience. Unlike heavy framework-based builds, this project focuses on core frontend mastery using vanilla technologies.',
         images: [
-            'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&h=400&fit=crop',
-            'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&h=400&fit=crop',
-            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=600&h=400&fit=crop'
+            './Project/Carscrubz/IMG1.png',
+            './Project/Carscrubz/IMG2.png',
+            './Project/Carscrubz/IMG3.png',
+            './Project/Carscrubz/IMG4.png'
         ],
-        skills: ['Python', 'TensorFlow', 'Redis', 'Docker', 'FastAPI'],
-        github: '#',
-        demo: '#'
+        skills: ['HTML', 'CSS', 'JAVASCRIPT'],
+        github: 'https://github.com/arvindvadivelu/Carscrubz-Website.git',
+        demo: 'https://carscrubz.netlify.app'
     },
+
     'farmiq': {
         title: 'FarmIQ',
-        desc: 'Comprehensive backend architecture for agricultural data analysis. Features include robust API endpoints for soil data ingestion, automated schema validation to handle inconsistent sensor data, and optimized SQL queries for generating real-time dashboards.',
+        desc: 'FarmIQ® Official (Phase 1) is a full-stack agricultural intelligence platform built to solve real-world farming challenges under the Smart India Hackathon 2024 problem statement.The platform enables: 🌱 Smart Crop Identification using AI Model (.h5), 📊 Farm Monitoring Dashboard,🌦 Real-time Crop Condition Monitoring, 🌿 Intelligent Crop Recommendation System, 🌐 Multi-Language User Access',
         images: [
-            'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=600&h=400&fit=crop',
-            'https://images.unsplash.com/photo-1625246333195-58197bd47d26?q=80&w=600&h=400&fit=crop'
+            '/Project/FarmIQ/IMG1.png',
+            '/Project/FarmIQ/IMG2.png',
+            '/Project/FarmIQ/IMG3.png',
+            '/Project/FarmIQ/IMG4.png',
+            '/Project/FarmIQ/IMG5.png'
         ],
-        skills: ['Java', 'Spring Boot', 'MySQL', 'Postman', 'Hibernate'],
-        github: '#',
-        demo: '#'
+        skills: ['HTML', 'CSS', 'JAVASCRIPT', 'PYTHON', 'SQL'],
+        github: 'https://github.com/arvindvadivelu/FarmIQ-Official.git',
+        demo: 'https://farmiq.netlify.app/'
+    },  // ✅ THIS COMMA WAS MISSING
+
+    'bmw': {
+        title: 'BMW M3 CS',
+        desc: 'High-performance automotive showcase project demonstrating advanced UI interactions, smooth video preview transitions, and structured content presentation. Designed to highlight performance specifications, engineering precision, and premium user experience.',
+        images: [
+            '/Project/BMW/IMG1.png',
+            '/Project/BMW/IMG2.png',
+            '/Project/BMW/IMG3.png',
+            '/Project/BMW/IMG4.png'
+        ],
+        skills: ['HTML', 'CSS', 'JAVASCRIPT'],
+        github: 'https://github.com/arvindvadivelu/BMW-M3-CS-Website.git',
+        demo: 'https://bmwm3cs.netlify.app'
     }
 };
+
 
 const modal = document.getElementById('project-modal');
 const modalContent = document.getElementById('modal-content');
@@ -170,4 +190,60 @@ function scrollGallery(elementId, direction) {
         left: direction * scrollAmount,
         behavior: 'smooth'
     });
+}
+document.querySelectorAll(".video-wrapper").forEach(wrapper => {
+    const video = wrapper.querySelector("video");
+    const thumbnail = wrapper.querySelector(".thumbnail");
+
+    wrapper.addEventListener("mouseenter", () => {
+        video.play();
+        thumbnail.style.opacity = "0";
+    });
+
+    wrapper.addEventListener("mouseleave", () => {
+        video.pause();
+        video.currentTime = 0;
+        thumbnail.style.opacity = "1";
+    });
+});
+
+const form = document.getElementById("contactForm");
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const button = form.querySelector("button");
+    button.disabled = true;
+    button.innerText = "Sending...";
+
+    const formData = new FormData(form);
+
+    await fetch("https://formsubmit.co/ajax/varvind2004@gmail.com", {
+        method: "POST",
+        body: formData
+    });
+
+    button.innerText = "Sent ✓";
+    button.classList.remove("bg-signal");
+    button.classList.add("bg-emerald-500");
+
+    showNotification("Message sent successfully!");
+
+    setTimeout(() => {
+        button.disabled = false;
+        button.innerText = "Send Message";
+        button.classList.remove("bg-emerald-500");
+        button.classList.add("bg-signal");
+    }, 5000);
+});
+
+function showNotification(message) {
+    const div = document.createElement("div");
+    div.innerText = message;
+    div.className = "fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-lg z-50";
+    document.body.appendChild(div);
+
+    setTimeout(() => {
+        div.remove();
+    }, 4000);
 }

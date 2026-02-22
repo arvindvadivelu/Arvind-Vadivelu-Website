@@ -62,4 +62,5 @@ The Token Bucket is the industry standard for API rate limiting. Imagine a bucke
 <p class="text-xl font-light text-gray-300 mb-8 leading-relaxed">\`\`\`java<br>@Component<br>public class RateLimiter {<br>    <br>    @Autowired<br>    private JedisPool jedisPool;<br>    <br>    public boolean isAllowed(String userId) {<br>        String key = "rate_limit:" + userId;<br>        <br>        try (Jedis jedis = jedisPool.getResource()) {<br>            long currentCount = jedis.incr(key);<br>            <br>            // If this is the first request, set the expiry time (e.g., 1 minute)<br>            if (currentCount == 1) {<br>                jedis.expire(key, 60);<br>            }<br>            <br>            // Check if they exceeded the limit of 100 requests per minute<br>            if (currentCount > 100) {<br>                return false; <br>            }<br>            <br>            return true;<br>        }<br>    }<br>}</p>
     `
     },
+    
 ];

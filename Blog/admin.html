@@ -19,7 +19,7 @@
             <h1 class="text-3xl font-bold">Content Generator</h1>
         </div>
 
-        <p class="text-gray-400 mb-8">Write your blog naturally. This tool will auto-format it, calculate the read time, and generate the exact JavaScript code to paste into <code>articles.js</code>.</p>
+        <p class="text-gray-400 mb-8">Write your blog naturally. This tool will auto-format it, calculate the read time, and generate the exact JavaScript object to paste into <code>articles.js</code>.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -40,8 +40,9 @@
                 <input type="text" id="desc" class="input-field" placeholder="A 2-line summary for the card...">
             </div>
             <div class="md:col-span-2">
-                <label class="text-sm text-gray-400 font-bold uppercase tracking-widest">Cover Image URL</label>
-                <input type="text" id="image" class="input-field" placeholder="https://images.unsplash.com/...">
+                <label class="text-sm text-gray-400 font-bold uppercase tracking-widest">Cover Image</label>
+                <p class="text-xs text-gray-500 mt-1">Paste a web URL (https://...) OR a local path. To use a local image, put it in an "images" folder and type <code>./images/your-pic.jpg</code></p>
+                <input type="text" id="image" class="input-field" placeholder="./images/my-cover.jpg">
             </div>
             <div class="md:col-span-2">
                 <label class="text-sm text-gray-400 font-bold uppercase tracking-widest mb-2 block">Content (Markdown Supported)</label>
@@ -55,9 +56,9 @@
         </button>
 
         <div id="output-area" class="hidden">
-            <h2 class="text-xl font-bold mb-4 text-green-400">✅ Success! Copy & Paste this at the top of articles.js:</h2>
+            <h2 class="text-xl font-bold mb-4 text-green-400">✅ Success! Copy & Paste this at the top of the array in articles.js:</h2>
             <div class="relative">
-                <button onclick="copyCode()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition-colors">Copy Code</button>
+                <button onclick="copyCode(event)" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition-colors">Copy Code</button>
                 <pre><code id="result-code" class="block bg-[#0F0F0F] border border-[#1F1F1F] p-6 rounded-xl overflow-x-auto text-sm text-gray-300 font-mono whitespace-pre-wrap"></code></pre>
             </div>
         </div>
@@ -72,7 +73,7 @@
             html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>');
             // Inline Code (`code`)
             html = html.replace(/\`([^`]+)\`/g, '<code>$1</code>');
-            // Headings (## Heading) -> mapped to <h3> for your design
+            // Headings (## Heading)
             html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
             html = html.replace(/^## (.*$)/gim, '<h3>$1</h3>');
             // Bold
@@ -100,27 +101,29 @@
             const dateOpts = { year: 'numeric', month: 'short', day: 'numeric' };
             const today = new Date().toLocaleDateString('en-US', dateOpts);
 
-            // Auto-Calculate Read Time (Assume 200 words per minute)
+            // Auto-Calculate Read Time
             const wordCount = rawContent.split(' ').length;
-            const readTime = Math.max(1, Math.ceil(wordCount / 200)) + " Min Read";
+            const readTime = Math.max(1, Math.ceil(wordCount / 200)) + " min read";
 
             // Parse Content
-            const parsedHTML = parseMarkdownToHTML(rawContent);
+            let parsedHTML = parseMarkdownToHTML(rawContent);
 
-            // Create the Code Template using Safe String Concatenation (Fixes the backtick error)
-            const finalCode = 
-            "    {\n" +
-            "        id: " + Date.now() + ",\n" +
-            "        title: \"" + title.replace(/"/g, '\\"') + "\",\n" +
-            "        category: \"" + category + "\",\n" +
-            "        date: \"" + today + "\",\n" +
-            "        readTime: \"" + readTime + "\",\n" +
-            "        desc: \"" + desc.replace(/"/g, '\\"') + "\",\n" +
-            "        image: \"" + image + "\",\n" +
-            "        content: `\n" +
-            "            " + parsedHTML + "\n" +
-            "        `\n" +
-            "    },";
+            // CRITICAL FIX: Escape backticks and dollar signs so it doesn't break JS template literals!
+            const safeHTML = parsedHTML.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+
+            // Format Output (Valid JS Object format)
+            const finalCode = `{
+    id: ${Date.now()},
+    title: "${title.replace(/"/g, '\\"')}",
+    category: "${category}",
+    date: "${today}",
+    readTime: "${readTime}",
+    desc: "${desc.replace(/"/g, '\\"')}",
+    image: "${image}",
+    content: \`
+${safeHTML}
+    \`
+},`;
 
             document.getElementById('result-code').textContent = finalCode;
             document.getElementById('output-area').classList.remove('hidden');
@@ -131,19 +134,21 @@
             }, 100);
         }
 
-        function copyCode() {
+        function copyCode(event) {
             const code = document.getElementById('result-code').textContent;
             navigator.clipboard.writeText(code);
             
-            // Give user feedback
+            // Visual feedback on the button
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "Copied!";
             btn.classList.add("bg-green-500", "text-black");
+            btn.classList.remove("bg-white/10", "hover:bg-white/20");
             
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.classList.remove("bg-green-500", "text-black");
+                btn.classList.add("bg-white/10", "hover:bg-white/20");
             }, 2000);
         }
     </script>
